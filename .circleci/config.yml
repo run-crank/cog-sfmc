@@ -9,7 +9,7 @@ executors:
     environment:
       IMAGE_NAME: stackmoxie/sfmc
     machine:
-      image: ubuntu-2004:202201-02
+      image: ubuntu-2004:2023.07.1
 
 jobs:
   test:
@@ -129,14 +129,14 @@ workflows:
           filters:
             branches:
               ignore:
-                - master
+                - main
             tags:
               ignore: /.*/
       - build:
           filters:
             branches:
               ignore:
-                - master
+                - main
             tags:
               ignore: /.*/
       - install-built-cog:
@@ -146,27 +146,27 @@ workflows:
           filters:
             branches:
               ignore:
-                - master
+                - main
             tags:
               ignore: /.*/
 
-  build-master:
+  build-main:
     jobs:
       - test:
           filters:
             branches:
-              only: master
+              only: main
       - build:
           filters:
             branches:
-              only: master
+              only: main
       - install-built-cog:
           requires:
             - test
             - build
           filters:
             branches:
-              only: master
+              only: main
       - publish-dev:
           context: docker-creds-to-publish-cogs
           requires:
@@ -174,7 +174,7 @@ workflows:
             - install-built-cog
           filters:
             branches:
-              only: master
+              only: main
 
   build-tags:
     jobs:
