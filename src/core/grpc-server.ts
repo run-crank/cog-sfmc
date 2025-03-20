@@ -39,7 +39,6 @@ server.bindAsync(`${host}:${port}`, credentials, (err, port) => {
   if (err) {
     throw err;
   }
-  server.start();
   console.log(`Server started, listening: ${host}:${port}`);
 });
 
