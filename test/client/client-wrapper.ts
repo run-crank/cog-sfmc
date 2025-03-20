@@ -3,7 +3,7 @@ import { default as sinon } from 'ts-sinon';
 import * as sinonChai from 'sinon-chai';
 import 'mocha';
 
-import { Metadata } from 'grpc';
+import { Metadata } from '@grpc/grpc-js';
 
 chai.use(sinonChai);
 

@@ -1,4 +1,4 @@
-import * as grpc from 'grpc';
+import * as grpc from '@grpc/grpc-js';
 import { Struct, Value } from 'google-protobuf/google/protobuf/struct_pb';
 import * as fs from 'fs';
 import * as redis from 'redis';
@@ -76,7 +76,7 @@ export class Cog implements ICogServiceServer {
    * authentication fields, and step definitions.
    */
   getManifest(
-    call: grpc.ServerUnaryCall<ManifestRequest>,
+    call: grpc.ServerUnaryCall<ManifestRequest, CogManifest>,
     callback: grpc.sendUnaryData<CogManifest>,
   ) {
     const manifest: CogManifest = new CogManifest();
@@ -167,7 +167,7 @@ export class Cog implements ICogServiceServer {
    * RunStepResponse.
    */
   async runStep(
-    call: grpc.ServerUnaryCall<RunStepRequest>,
+    call: grpc.ServerUnaryCall<RunStepRequest, CogManifest>,
     callback: grpc.sendUnaryData<RunStepResponse>,
   ) {
     const step: Step = call.request.getStep();
