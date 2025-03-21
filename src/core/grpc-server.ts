@@ -1,9 +1,10 @@
-import * as grpc from 'grpc';
+import * as grpc from '@grpc/grpc-js';
 import { CogServiceService as CogService } from '../proto/cog_grpc_pb';
 import { Cog } from './cog';
-import { ClientWrapper } from '../client/client-wrapper';
+import { CachingClientWrapper } from '../client/caching-client-wrapper';
+import { TypedServerOverride } from './typed-server-override';
 
-const server = new grpc.Server();
+const server = new TypedServerOverride();
 const port = process.env.PORT || 28866;
 const host = process.env.HOST || '0.0.0.0';
 const redisUrl = process.env.REDIS_URL || null;
@@ -33,10 +34,13 @@ if (mailgunApiKey && mailgunDomain && mailgunAlertEmail) {
   };
 }
 
-server.addService(CogService, new Cog(ClientWrapper));
-server.bind(`${host}:${port}`, credentials);
-server.start();
-console.log(`Server started, listening: ${host}:${port}`);
+server.addServiceTyped(CogService, new Cog(CachingClientWrapper, {}, redisUrl, mailgunCredentials));
+server.bindAsync(`${host}:${port}`, credentials, (err, port) => {
+  if (err) {
+    throw err;
+  }
+  console.log(`Server started, listening: ${host}:${port}`);
+});
 
 // Export server for testing.
 export default server;
