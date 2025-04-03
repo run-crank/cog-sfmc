@@ -1,0 +1,5 @@
+scenario: Demonstrate the SFMC Cog
+description: A contrived scenario that shows basic checks.
+
+steps:
+- step: the contactStatus field on sfmc contact with key UI-001 should be Active

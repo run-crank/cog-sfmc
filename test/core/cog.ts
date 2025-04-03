@@ -6,72 +6,128 @@ import 'mocha';
 
 import { Step as ProtoStep, StepDefinition, FieldDefinition, RunStepResponse, RunStepRequest } from '../../src/proto/cog_pb';
 import { Cog } from '../../src/core/cog';
-import { CogManifest } from '../../src/proto/cog_pb';
+import { CogManifest, ManifestRequest } from '../../src/proto/cog_pb';
 import { Metadata } from '@grpc/grpc-js';
 import { Duplex } from 'stream';
 import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
+import { ClientWrapper } from '../../src/client/client-wrapper';
+import { ServerUnaryCall, sendUnaryData } from '@grpc/grpc-js';
+import { EventEmitter } from 'events';
 
 chai.use(sinonChai);
 
 describe('Cog:GetManifest', () => {
   const expect = chai.expect;
-  let cogUnderTest: Cog;
+  let cog: Cog;
   let clientWrapperStub: any;
+  let metadata: Metadata;
 
   beforeEach(() => {
-    clientWrapperStub = sinon.stub();
-    cogUnderTest = new Cog(clientWrapperStub);
+    clientWrapperStub = sinon.createStubInstance(ClientWrapper);
+    metadata = new Metadata();
+    cog = new Cog(clientWrapperStub);
   });
 
   it('should return expected cog metadata', (done) => {
     const version: string = JSON.parse(fs.readFileSync('package.json').toString('utf8')).version;
-    cogUnderTest.getManifest(null, (err, manifest: CogManifest) => {
-      expect(manifest.getName()).to.equal('stackmoxie/sfmc');
-      expect(manifest.getVersion()).to.equal(version);
+    const mockCall = Object.assign(new EventEmitter(), {
+      request: new ManifestRequest(),
+      metadata: new Metadata(),
+      getPeer: () => 'test',
+      getDeadline: () => new Date(),
+      getPath: () => 'test',
+      getHost: () => 'test',
+      cancelled: false,
+      sendMetadata: () => {}
+    }) as ServerUnaryCall<ManifestRequest, CogManifest>;
+
+    const callback: sendUnaryData<CogManifest> = (err, manifest) => {
+      expect(err).to.be.null;
+      expect(manifest).to.be.instanceOf(CogManifest);
+      
+      if (manifest) {
+        expect(manifest.getName()).to.equal('stackmoxie/sfmc');
+        expect(manifest.getVersion()).to.equal(version);
+      }
       done();
-    });
+    };
+
+    cog.getManifest(mockCall, callback);
   });
 
   it('should return expected cog auth fields', (done) => {
-    cogUnderTest.getManifest(null, (err, manifest: CogManifest) => {
-      const authFields: any[] = manifest.getAuthFieldsList().map((field: FieldDefinition) => {
-        return field.toObject();
-      });
+    const expectedAuthFields = [
+      {
+        field: 'restEndpoint',
+        type: FieldDefinition.Type.STRING,
+        description: 'REST API Instance URL, e.g. https://ZZZZZZZ.rest.marketingcloudapis.com/'
+      },
+      {
+        field: 'clientId',
+        type: FieldDefinition.Type.STRING,
+        description: 'OAuth2 Client ID'
+      },
+      {
+        field: 'clientSecret',
+        type: FieldDefinition.Type.STRING,
+        description: 'OAuth2 Client Secret'
+      }
+    ];
 
-      // Auth URL field
-      const authUrl: any = authFields.filter(a => a.key === 'authUrl')[0];
-      expect(authUrl.type).to.equal(FieldDefinition.Type.URL);
-      expect(authUrl.optionality).to.equal(FieldDefinition.Optionality.REQUIRED);
+    const mockCall = Object.assign(new EventEmitter(), {
+      request: new ManifestRequest(),
+      metadata: new Metadata(),
+      getPeer: () => 'test',
+      getDeadline: () => new Date(),
+      getPath: () => 'test',
+      getHost: () => 'test',
+      cancelled: false,
+      sendMetadata: () => {}
+    }) as ServerUnaryCall<ManifestRequest, CogManifest>;
 
-      // Client ID field
-      const clientId: any = authFields.filter(a => a.key === 'clientId')[0];
-      expect(clientId.type).to.equal(FieldDefinition.Type.STRING);
-      expect(clientId.optionality).to.equal(FieldDefinition.Optionality.REQUIRED);
+    const callback: sendUnaryData<CogManifest> = (err, response) => {
+      expect(err).to.be.null;
+      expect(response).to.be.instanceOf(CogManifest);
+      
+      if (response) {
+        const authFields = response.getAuthFieldsList().map(field => ({
+          field: field.getKey(),
+          type: field.getType(),
+          description: field.getDescription()
+        }));
 
-      // Client Secret field
-      const clientSecret: any = authFields.filter(a => a.key === 'clientSecret')[0];
-      expect(clientSecret.type).to.equal(FieldDefinition.Type.STRING);
-      expect(clientSecret.optionality).to.equal(FieldDefinition.Optionality.REQUIRED);
-
-      // Account Id field
-      const accountId: any = authFields.filter(a => a.key === 'accountId')[0];
-      expect(accountId.type).to.equal(FieldDefinition.Type.STRING);
-      expect(accountId.optionality).to.equal(FieldDefinition.Optionality.REQUIRED);
-
+        expect(authFields).to.deep.equal(expectedAuthFields);
+      }
       done();
-    });
+    };
+
+    cog.getManifest(mockCall, callback);
   });
 
   it('should return expected step definitions', (done) => {
-    cogUnderTest.getManifest(null, (err, manifest: CogManifest) => {
-      const stepDefs: StepDefinition[] = manifest.getStepDefinitionsList();
+    const mockCall = Object.assign(new EventEmitter(), {
+      request: new ManifestRequest(),
+      metadata: new Metadata(),
+      getPeer: () => 'test',
+      getDeadline: () => new Date(),
+      getPath: () => 'test',
+      getHost: () => 'test',
+      cancelled: false,
+      sendMetadata: () => {}
+    }) as ServerUnaryCall<ManifestRequest, CogManifest>;
 
-      // Test for the presence of step definitions in your manifest like this:
-      // const someStepExists: boolean = stepDefs.filter(s => s.getStepId() === 'SomeStepClass').length === 1;
-      // expect(someStepExists).to.equal(true);
-
+    const callback: sendUnaryData<CogManifest> = (err, manifest) => {
+      expect(err).to.be.null;
+      expect(manifest).to.be.instanceOf(CogManifest);
+      
+      if (manifest) {
+        const stepDefs = manifest.getStepDefinitionsList();
+        expect(stepDefs.length).to.be.greaterThan(0);
+      }
       done();
-    });
+    };
+
+    cog.getManifest(mockCall, callback);
   });
 
 });

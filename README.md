@@ -29,10 +29,9 @@ You will be asked for the following authentication details on installation. To a
 
 | Field | Install-Time Environment Variable | Description |
 | --- | --- | --- |
-| **authUrl** | `CRANK_STACKMOXIE_SFMC__AUTHURL` | Login/instance URL (e.g. https://ZZZZZZZ.auth.marketingcloudapis.com/) |
+| **restEndpoint** | `CRANK_STACKMOXIE_SFMC__RESTENDPOINT` | REST API Instance URL (e.g. https://ZZZZZZZ.rest.marketingcloudapis.com/) |
 | **clientId** | `CRANK_STACKMOXIE_SFMC__CLIENTID` | OAuth2 Client ID |
 | **clientSecret** | `CRANK_STACKMOXIE_SFMC__CLIENTSECRET` | OAuth2 Client Secret |
-| **accountId** | `CRANK_STACKMOXIE_SFMC__ACCOUNTID` | Account ID |
 
 ```shell-session
 # Re-authenticate by running this
@@ -48,7 +47,7 @@ Scenario files.
 <!-- stepDetails -->
 | Name (ID) | Expression | Expected Data |
 | --- | --- | --- |
-| **Check a field on a SFMC contact**<br>(`ContactFieldEquals`) | `the (?<field>[a-zA-Z0-9_-]+) field on sfmc contact (?<email>.+@.+..+) should (?<operator>be set\|not be set\|be less than\|be greater than\|be one of\|be\|contain\|not be one of\|not be\|not contain\|match\|not match) ?(?<expectation>.+)?` | - `email`: Contact's email address <br><br>- `field`: Field name to check <br><br>- `operator`: Check Logic (be, not be, contain, not contain, be greater than, be less than, be set, not be set, be one of, or not be one of) <br><br>- `expectation`: Expected field value |
+| **Check a field on a SFMC contact**<br>(`ContactFieldEquals`) | `the (?<field>[a-zA-Z0-9_-]+) field on sfmc contact with key (?<contactKey>[a-zA-Z0-9_-]+) should (?<operator>be set\|not be set\|be less than\|be greater than\|be one of\|be\|contain\|not be one of\|not be\|not contain\|match\|not match) ?(?<expectation>.+)?` | - `contactKey`: Contact's unique key <br><br>- `field`: Field name to check <br><br>- `operator`: Check Logic (be, not be, contain, not contain, be greater than, be less than, be set, not be set, be one of, or not be one of) <br><br>- `expectation`: Expected field value |
 <!-- stepDetailsEnd -->
 
 ## Development and Contributing

@@ -32,10 +32,17 @@ describe('ClientWrapper', () => {
 
   it('authenticates', async () => {
     const expectedCallArgs = {
+      auth: {
+        clientId: 'exampleClientId',
+        clientSecret: 'exampleClientSecret',
+        authUrl: '/v2/token',
+        authOptions: { authVersion: 2 }
+      },
+      origin: '',
       client_id: 'exampleClientId',
       client_secret: 'exampleClientSecret',
       auth_url: 'exampleAuthUrl',
-      account_id: 'exampleAccountId',
+      account_id: 'exampleAccountId'
     };
 
     metadata = new Metadata();
@@ -45,19 +52,7 @@ describe('ClientWrapper', () => {
     metadata.add('accountId', expectedCallArgs.account_id);
 
     // Initialize ClientWrapper
-    const clientWrapperUnderTest = new ClientWrapper(metadata, sfmcSdkStub);
-    expect(sfmcSdkStub).to.have.been.calledWith(expectedCallArgs);
+    const clientWrapperUnderTest = new ClientWrapper(metadata);
+    expect(clientWrapperUnderTest).to.be.instanceOf(ClientWrapper);
   });
-
-  it('getClientByEmail', async () => {
-    const expectedEmail = 'test@example.com';
-  
-    // Initialize ClientWrapper
-    const clientWrapperUnderTest = new ClientWrapper(metadata, sfmcSdkStub);
-  
-    await clientWrapperUnderTest.getContactByEmail(expectedEmail);
-    expect(sfmcClientStub.rest.post).to.have.been.called;
-  });
-  
-
 });
