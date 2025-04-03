@@ -28,7 +28,7 @@ describe('ContactFieldEquals', () => {
     expect(stepDef.getStepId()).to.equal('ContactFieldEquals');
     expect(stepDef.getName()).to.equal('Check a field on a SFMC contact');
     expect(!!stepDef.getHelp()).to.equal(false);
-    expect(stepDef.getExpression()).to.equal('the (?<field>[a-zA-Z0-9_-]+) field on sfmc contact (?<email>.+\@.+\..+) should (?<operator>be set|not be set|be less than|be greater than|be one of|be|contain|not be one of|not be|not contain|match|not match) ?(?<expectation>.+)?');
+    expect(stepDef.getExpression()).to.equal('the (?<field>[a-zA-Z0-9_-]+) field on sfmc contact with key (?<contactKey>[a-zA-Z0-9_-]+) should (?<operator>be set|not be set|be less than|be greater than|be one of|be|contain|not be one of|not be|not contain|match|not match) ?(?<expectation>.+)?');
     expect(stepDef.getType()).to.equal(StepDefinition.Type.VALIDATION);
   });
 
@@ -38,15 +38,20 @@ describe('ContactFieldEquals', () => {
       return field.toObject();
     });
 
+    // ContactKey field
+    const contactKey: any = fields.filter(f => f.key === 'contactKey')[0];
+    expect(contactKey.optionality).to.equal(FieldDefinition.Optionality.REQUIRED);
+    expect(contactKey.type).to.equal(FieldDefinition.Type.STRING);
+
     // Field field
     const field: any = fields.filter(f => f.key === 'field')[0];
     expect(field.optionality).to.equal(FieldDefinition.Optionality.REQUIRED);
     expect(field.type).to.equal(FieldDefinition.Type.STRING);
 
-    // Email field
-    const email: any = fields.filter(f => f.key === 'email')[0];
-    expect(email.optionality).to.equal(FieldDefinition.Optionality.REQUIRED);
-    expect(email.type).to.equal(FieldDefinition.Type.EMAIL);
+    // Operator field
+    const operator: any = fields.filter(f => f.key === 'operator')[0];
+    expect(operator.optionality).to.equal(FieldDefinition.Optionality.OPTIONAL);
+    expect(operator.type).to.equal(FieldDefinition.Type.STRING);
 
     // Expectation field
     const expectation: any = fields.filter(f => f.key === 'expectation')[0];

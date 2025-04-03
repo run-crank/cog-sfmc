@@ -3,7 +3,7 @@ import { Field } from '../core/base-step';
 import { FieldDefinition } from '../proto/cog_pb';
 import { ContactAwareMixin } from './mixins';
 
-const SDK = require('sfmc-sdk');
+const fuelRest = require('fuel-rest');
 
 class ClientWrapper {
 
@@ -11,9 +11,9 @@ class ClientWrapper {
    * Oauth2 using sfmc-sdk
    */
   public static expectedAuthFields: Field[] = [{
-    field: 'authUrl',
-    type: FieldDefinition.Type.URL,
-    description: 'Login/instance URL (e.g. https://ZZZZZZZ.auth.marketingcloudapis.com/)',
+    field: 'restEndpoint',
+    type: FieldDefinition.Type.STRING,
+    description: 'REST API Instance URL, e.g. https://ZZZZZZZ.rest.marketingcloudapis.com/',
   }, {
     field: 'clientId',
     type: FieldDefinition.Type.STRING,
@@ -22,10 +22,6 @@ class ClientWrapper {
     field: 'clientSecret',
     type: FieldDefinition.Type.STRING,
     description: 'OAuth2 Client Secret',
-  }, {
-    field: 'accountId',
-    type: FieldDefinition.Type.STRING,
-    description: 'Account ID',
   }];
 
   public client: any;
@@ -38,24 +34,18 @@ class ClientWrapper {
    *   call. Will be populated with authentication metadata according to the
    *   expectedAuthFields array defined above.
    */
-  constructor (auth: grpc.Metadata, clientConstructor = SDK) {
+  constructor (auth: grpc.Metadata, clientConstructor = fuelRest) {
     this.client = new clientConstructor(
       {
-        client_id: auth.get('clientId').toString(),
-        client_secret: auth.get('clientSecret').toString(),
-        auth_url: auth.get('authUrl').toString(),
-        account_id: auth.get('accountId').toString(),
-      },
-      {
-        eventHandlers: {
-          onLoop: (type, accumulator) => console.log('Looping', type, accumulator.length),
-          onRefresh: options => console.log('RefreshingToken.', options),
-          logRequest: req => console.log(req),
-          logResponse: res => console.log(res),
-          onConnectionError: (ex, remainingAttempts) => console.log(ex.code, remainingAttempts),
+        auth:{
+          clientId: auth.get('clientId').toString(),
+          clientSecret: auth.get('clientSecret').toString(),
+          authUrl: `${auth.get('restEndpoint').toString().replace('.rest.', '.auth.')}/v2/token`,
+          authOptions: {
+            authVersion: 2,
+          },
         },
-        requestAttempts : 1,
-        retryOnConnectionError: true,
+        origin: auth.get('restEndpoint').toString(),
       },
     );
   }

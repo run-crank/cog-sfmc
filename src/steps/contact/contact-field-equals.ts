@@ -9,14 +9,14 @@ export class ContactFieldEquals extends BaseStep implements StepInterface {
 
   protected stepName: string = 'Check a field on a SFMC contact';
   // tslint:disable-next-line:max-line-length
-  protected stepExpression: string = 'the (?<field>[a-zA-Z0-9_-]+) field on sfmc contact (?<email>.+\@.+\..+) should (?<operator>be set|not be set|be less than|be greater than|be one of|be|contain|not be one of|not be|not contain|match|not match) ?(?<expectation>.+)?';
+  protected stepExpression: string = 'the (?<field>[a-zA-Z0-9_-]+) field on sfmc contact with key (?<contactKey>[a-zA-Z0-9_-]+) should (?<operator>be set|not be set|be less than|be greater than|be one of|be|contain|not be one of|not be|not contain|match|not match) ?(?<expectation>.+)?';
   protected stepType: StepDefinition.Type = StepDefinition.Type.VALIDATION;
   protected actionList: string[] = ['check'];
   protected targetObject: string = 'Contact';
   protected expectedFields: Field[] = [{
-    field: 'email',
-    type: FieldDefinition.Type.EMAIL,
-    description: "Contact's email address",
+    field: 'contactKey',
+    type: FieldDefinition.Type.STRING,
+    description: "Contact's unique key",
     bulksupport: true,
   }, {
     field: 'field',
@@ -43,9 +43,9 @@ export class ContactFieldEquals extends BaseStep implements StepInterface {
       type: FieldDefinition.Type.NUMERIC,
       description: 'The Contact\'s ID',
     }, {
-      field: 'email',
-      type: FieldDefinition.Type.EMAIL,
-      description: 'The Contact\'s Email',
+      field: 'contactKey',
+      type: FieldDefinition.Type.STRING,
+      description: 'The Contact\'s Key',
     }, {
       field: 'createdate',
       type: FieldDefinition.Type.DATETIME,
@@ -61,22 +61,19 @@ export class ContactFieldEquals extends BaseStep implements StepInterface {
   async executeStep(step: Step) {
     const stepData: any = step.getData() ? step.getData().toJavaScript() : {};
     const expectation = stepData.expectation;
-    const email = stepData.email;
+    const contactKey = stepData.contactKey;
     const field = stepData.field;
     const operator = stepData.operator || 'be';
 
     try {
-      const contact = await this.client.getContactByEmail(email);
+      const contact = await this.client.getContactByKey(contactKey);
+      console.log('Contact:', JSON.stringify(contact, null, 2));
 
-      // If empty fields are not being returned by the API, default to undefined
-      // so that checks that are expected to fail will behave as expected
-      const value = contact.properties[field]
-        ? contact.properties[field].value : null;
-
-      const actual = this.client.isDate(value) ? this.client.toDate(value) : value;
+      // Handle the flat structure of the contact object
+      const value = contact[field] || null;
 
       const records = this.createRecords(contact, stepData['__stepOrder']);
-      const result = this.assert(operator, actual, expectation, field, stepData['__piiSuppressionLevel']);
+      const result = this.assert(operator, value, expectation, field, stepData['__piiSuppressionLevel']);
 
       return result.valid ? this.pass(result.message, [], records)
         : this.fail(result.message, [], records);
@@ -89,15 +86,22 @@ export class ContactFieldEquals extends BaseStep implements StepInterface {
         return this.error('There was an error checking the contact field: %s', [e.message]);
       }
 
+      // Handle API errors and validation errors
+      if (e instanceof Error) {
+        return this.error('There was an error checking the contact field: %s', [e.message]);
+      }
       return this.error('There was an error checking the contact field: %s', [e.toString()]);
     }
   }
 
   public createRecords(contact, stepOrder = 1): StepRecord[] {
-    const obj = {};
-    Object.keys(contact.properties).forEach(key => obj[key] = contact.properties[key].value);
-    obj['createdate'] = this.client.toDate(obj['createdate']);
-    obj['lastmodifieddate'] = this.client.toDate(obj['lastmodifieddate']);
+    const obj = {
+      id: contact.contactID,
+      contactKey: contact.contactKey,
+      createdate: contact.modifiedDate,
+      lastmodifieddate: contact.modifiedDate,
+      ...contact,
+    };
 
     const records = [];
     // Base Record
