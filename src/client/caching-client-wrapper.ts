@@ -14,13 +14,27 @@ class CachingClientWrapper {
   // -------------------------------------------------------------------
 
   public async getContactByEmail(email: string) {
-    const cachekey = `SFMC|Contact|${email}|${this.cachePrefix}`;
+    const cachekey = `SFMC|Contact|Email|${email}|${this.cachePrefix}`;
     const stored = await this.getCache(cachekey);
     if (stored) {
       return stored;
     }
 
     const result = await this.client.getContactByEmail(email);
+    if (result) {
+      await this.setCache(cachekey, result);
+    }
+    return result;
+  }
+
+  public async getContactByKey(contactKey: string) {
+    const cachekey = `SFMC|Contact|Key|${contactKey}|${this.cachePrefix}`;
+    const stored = await this.getCache(cachekey);
+    if (stored) {
+      return stored;
+    }
+
+    const result = await this.client.getContactByEmail(contactKey);
     if (result) {
       await this.setCache(cachekey, result);
     }
