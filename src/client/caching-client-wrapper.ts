@@ -34,28 +34,41 @@ class CachingClientWrapper {
       return stored;
     }
 
-    const result = await this.client.getContactByEmail(contactKey);
+    const result = await this.client.getContactByKey(contactKey);
     if (result) {
       await this.setCache(cachekey, result);
     }
     return result;
   }
 
-//   Example of a passthrough method with clearing cache:
-//
-//   public async createOrUpdateContact(email, contact) {
-//     await this.clearCache();
-//     return await this.client.createOrUpdateContact(email, contact);
-//   }
+  public async getContact(contactKey: string) {
+    const cachekey = `SFMC|Contact|${contactKey}|${this.cachePrefix}`;
+    const stored = await this.getCache(cachekey);
+    if (stored) {
+      return stored;
+    }
 
-  // all non-cached methods, just referencing the original function
-  // -------------------------------------------------------------------
+    const result = await this.client.getContact(contactKey);
+    if (result) {
+      await this.setCache(cachekey, result);
+    }
+    return result;
+  }
 
-  // Example method isDate:
-  //
-//   public isDate(value) {
-//     return this.client.isDate(value);
-//   }
+  public async createContact(contact: any) {
+    await this.clearCache();
+    return await this.client.createContact(contact);
+  }
+
+  public async updateContact(contactKey: string, contact: any) {
+    await this.clearCache();
+    return await this.client.updateContact(contactKey, contact);
+  }
+
+  public async deleteContact(contactKey: string) {
+    await this.clearCache();
+    return await this.client.deleteContact(contactKey);
+  }
 
   // Redis methods for get, set, and delete
   // -------------------------------------------------------------------
@@ -110,7 +123,6 @@ class CachingClientWrapper {
       console.log(err);
     }
   }
-
 }
 
 export { CachingClientWrapper as CachingClientWrapper };
