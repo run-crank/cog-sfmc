@@ -1,0 +1,33 @@
+scenario: SFMC Contact Operations
+description: >
+  This scenario demonstrates the basic contact operations in SFMC including
+  creation, discovery, update, and deletion.
+
+tokens:
+  test.contactKey: test_contact_123
+  test.email: test@example.com
+  test.firstname: John
+  test.lastname: Doe
+  test.company: Test Company
+
+steps:
+- step: Given I create a SFMC Contact
+  data:
+    contact:
+      contactKey: '{{test.contactKey}}'
+      email: '{{test.email}}'
+      firstname: '{{test.firstname}}'
+      lastname: '{{test.lastname}}'
+      company: '{{test.company}}'
+
+- step: Then I discover fields on the SFMC Contact with key {{test.contactKey}}
+
+- step: When I update a SFMC Contact with key {{test.contactKey}}
+  data:
+    contact:
+      company: 'Updated Company Name'
+      firstname: 'Updated First Name'
+
+- step: Then I discover fields on the SFMC Contact with key {{test.contactKey}}
+
+- step: Finally, delete the SFMC Contact with key {{test.contactKey}} 
