@@ -1,7 +1,7 @@
 import * as grpc from '@grpc/grpc-js';
 import { Field } from '../core/base-step';
 import { FieldDefinition } from '../proto/cog_pb';
-import { ContactAwareMixin } from './mixins';
+import { ContactAwareMixin, JourneyAwareMixin } from './mixins';
 
 const fuelRest = require('fuel-rest');
 
@@ -51,8 +51,8 @@ class ClientWrapper {
   }
 }
 
-interface ClientWrapper extends ContactAwareMixin {}
-applyMixins(ClientWrapper, [ContactAwareMixin]);
+interface ClientWrapper extends ContactAwareMixin, JourneyAwareMixin {}
+applyMixins(ClientWrapper, [ContactAwareMixin, JourneyAwareMixin]);
 
 function applyMixins(derivedCtor: any, baseCtors: any[]) {
   baseCtors.forEach((baseCtor) => {

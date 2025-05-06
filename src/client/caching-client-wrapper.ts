@@ -1,5 +1,7 @@
-import { ClientWrapper } from '../client/client-wrapper';
+import { ClientWrapper } from './client-wrapper';
 import { promisify } from 'util';
+import * as grpc from '@grpc/grpc-js';
+import { ContactAwareMixin, JourneyAwareMixin } from './mixins';
 
 class CachingClientWrapper {
   // cachePrefix is scoped to the specific scenario, request, and requestor
@@ -122,6 +124,69 @@ class CachingClientWrapper {
     } catch (err) {
       console.log(err);
     }
+  }
+
+  // Add journey-related methods with caching
+
+  public async getJourneyById(journeyId: string, extras: string = ''): Promise<Record<string, any>> {
+    const cachekey = `SFMC|Journey|Id|${journeyId}|${this.cachePrefix}`;
+    const stored = await this.getCache(cachekey);
+    if (stored) {
+      return stored;
+    }
+
+    const result = await this.client.getJourneyById(journeyId, extras);
+    if (result) {
+      await this.setCache(cachekey, result);
+    }
+    return result;
+  }
+
+  public async getJourneyByKey(journeyKey: string, extras: string = ''): Promise<Record<string, any>> {
+    const cachekey = `SFMC|Journey|Key|${journeyKey}|${this.cachePrefix}`;
+    const stored = await this.getCache(cachekey);
+    if (stored) {
+      return stored;
+    }
+
+    const result = await this.client.getJourneyByKey(journeyKey, extras);
+    if (result) {
+      await this.setCache(cachekey, result);
+    }
+    return result;
+  }
+
+  public async createJourney(journeyDefinition: Record<string, any>): Promise<Record<string, any>> {
+    await this.clearCache();
+    return await this.client.createJourney(journeyDefinition);
+  }
+
+  public async updateJourney(journeyId: string, journeyDefinition: Record<string, any>): Promise<Record<string, any>> {
+    await this.clearCache();
+    return await this.client.updateJourney(journeyId, journeyDefinition);
+  }
+
+  public async deleteJourney(journeyId: string): Promise<boolean> {
+    await this.clearCache();
+    return await this.client.deleteJourney(journeyId);
+  }
+
+  public async activateJourney(journeyId: string): Promise<Record<string, any>> {
+    await this.clearCache();
+    return await this.client.activateJourney(journeyId);
+  }
+
+  public async getJourneyStatus(journeyId: string): Promise<string> {
+    return await this.client.getJourneyStatus(journeyId);
+  }
+
+  public async addContactToJourney(journeyKey: string, contactKey: string, data: Record<string, any> = {}): Promise<Record<string, any>> {
+    await this.clearCache();
+    return await this.client.addContactToJourney(journeyKey, contactKey, data);
+  }
+
+  public async isContactInJourney(contactKey: string, journeyId?: string): Promise<boolean> {
+    return await this.client.isContactInJourney(contactKey, journeyId);
   }
 }
 
