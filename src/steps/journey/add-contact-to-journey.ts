@@ -12,7 +12,7 @@ export class AddContactToJourney extends BaseStep implements StepInterface {
   protected stepExpression: string = 'add the contact with key (?<contactKey>[a-zA-Z0-9_@.-]+) to salesforce marketing cloud journey (?<journeyKey>[a-zA-Z0-9_-]+)';
   protected stepType: StepDefinition.Type = StepDefinition.Type.ACTION;
   protected actionList: string[] = ['add'];
-  protected targetObject: string = 'Contact';
+  protected targetObject: string = 'Contact to Journey';
   protected expectedFields: Field[] = [
     {
       field: 'contactKey',
