@@ -1,7 +1,7 @@
 import { ClientWrapper } from './client-wrapper';
 import { promisify } from 'util';
 import * as grpc from '@grpc/grpc-js';
-import { ContactAwareMixin, JourneyAwareMixin } from './mixins';
+import { ContactAwareMixin, JourneyAwareMixin, ListAwareMixin } from './mixins';
 
 class CachingClientWrapper {
   // cachePrefix is scoped to the specific scenario, request, and requestor
@@ -188,6 +188,98 @@ class CachingClientWrapper {
   public async isContactInJourney(contactKey: string, journeyId?: string): Promise<boolean> {
     return await this.client.isContactInJourney(contactKey, journeyId);
   }
-}
 
+  // --------------------------------
+  // List-related caching methods
+  // --------------------------------
+
+  public async getListById(listId: string): Promise<Record<string, any>> {
+    const cachekey = `SFMC|List|Id|${listId}|${this.cachePrefix}`;
+    const stored = await this.getCache(cachekey);
+    if (stored) {
+      return stored;
+    }
+
+    const result = await this.client.getListById(listId);
+    if (result) {
+      await this.setCache(cachekey, result);
+    }
+    return result;
+  }
+
+  public async getListByName(listName: string): Promise<Record<string, any>> {
+    const cachekey = `SFMC|List|Name|${listName}|${this.cachePrefix}`;
+    const stored = await this.getCache(cachekey);
+    if (stored) {
+      return stored;
+    }
+
+    const result = await this.client.getListByName(listName);
+    if (result) {
+      await this.setCache(cachekey, result);
+    }
+    return result;
+  }
+
+  public async getAllLists(filters: Record<string, any> = {}): Promise<Record<string, any>[]> {
+    // Create a cache key that includes the filter keys and values
+    const filterString = Object.keys(filters)
+      .sort()
+      .map(key => `${key}=${filters[key]}`)
+      .join('|');
+
+    const cachekey = `SFMC|Lists|${filterString}|${this.cachePrefix}`;
+    const stored = await this.getCache(cachekey);
+    if (stored) {
+      return stored;
+    }
+
+    const result = await this.client.getAllLists(filters);
+    if (result) {
+      await this.setCache(cachekey, result);
+    }
+    return result;
+  }
+
+  public async getListMembers(listId: string, options: Record<string, any> = {}): Promise<Record<string, any>[]> {
+    // Create a cache key that includes the pagination parameters
+    const optionsString = JSON.stringify(options);
+    const cachekey = `SFMC|List|${listId}|Members|${optionsString}|${this.cachePrefix}`;
+    const stored = await this.getCache(cachekey);
+    if (stored) {
+      return stored;
+    }
+
+    const result = await this.client.getListMembers(listId, options);
+    if (result) {
+      await this.setCache(cachekey, result);
+    }
+    return result;
+  }
+
+  public async createList(listDefinition: Record<string, any>): Promise<Record<string, any>> {
+    await this.clearCache();
+    return await this.client.createList(listDefinition);
+  }
+
+  public async updateList(listId: string, listDefinition: Record<string, any>): Promise<Record<string, any>> {
+    await this.clearCache();
+    return await this.client.updateList(listId, listDefinition);
+  }
+
+  public async deleteList(listId: string): Promise<boolean> {
+    await this.clearCache();
+    return await this.client.deleteList(listId);
+  }
+
+  public async addContactToList(listId: string, contactKey: string): Promise<Record<string, any>> {
+    await this.clearCache();
+    return await this.client.addContactToList(listId, contactKey);
+  }
+
+  public async removeContactFromList(listId: string, contactKey: string): Promise<boolean> {
+    await this.clearCache();
+    return await this.client.removeContactFromList(listId, contactKey);
+  }
+}
 export { CachingClientWrapper as CachingClientWrapper };
