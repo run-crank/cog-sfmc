@@ -5,8 +5,8 @@
   "license": "MIT",
   "cog": {
     "name": "stackmoxie/sfmc",
-    "label": "sfmc",
-    "homepage": "",
+    "label": "Salesforce Marketing Cloud",
+    "homepage": "https://github.com/run-crank/cog-sfmc",
     "authHelpUrl": ""
   },
   "scripts": {
@@ -60,6 +60,7 @@
     "@run-crank/utilities": "^0.5.2",
     "@typescript-eslint/eslint-plugin": "^6.12.0",
     "fuel-rest": "^3.2.2",
+    "fuel-soap": "^2.2.4",
     "google-protobuf": "^3.8.0",
     "mailgun-js": "^0.22.0",
     "redis": "^3.1.2",

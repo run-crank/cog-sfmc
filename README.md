@@ -29,7 +29,7 @@ You will be asked for the following authentication details on installation. To a
 
 | Field | Install-Time Environment Variable | Description |
 | --- | --- | --- |
-| **restEndpoint** | `CRANK_STACKMOXIE_SFMC__RESTENDPOINT` | REST API Instance URL (e.g. https://ZZZZZZZ.rest.marketingcloudapis.com/) |
+| **restEndpoint** | `CRANK_STACKMOXIE_SFMC__RESTENDPOINT` | REST API Instance URL, e.g. https://ZZZZZZZ.rest.marketingcloudapis.com/ |
 | **clientId** | `CRANK_STACKMOXIE_SFMC__CLIENTID` | OAuth2 Client ID |
 | **clientSecret** | `CRANK_STACKMOXIE_SFMC__CLIENTSECRET` | OAuth2 Client Secret |
 
@@ -48,6 +48,24 @@ Scenario files.
 | Name (ID) | Expression | Expected Data |
 | --- | --- | --- |
 | **Check a field on a SFMC contact**<br>(`ContactFieldEquals`) | `the (?<field>[a-zA-Z0-9_-]+) field on sfmc contact with key (?<contactKey>[a-zA-Z0-9_-]+) should (?<operator>be set\|not be set\|be less than\|be greater than\|be one of\|be\|contain\|not be one of\|not be\|not contain\|match\|not match) ?(?<expectation>.+)?` | - `contactKey`: Contact's unique key <br><br>- `field`: Field name to check <br><br>- `operator`: Check Logic (be, not be, contain, not contain, be greater than, be less than, be set, not be set, be one of, or not be one of) <br><br>- `expectation`: Expected field value |
+| **Create a SFMC contact**<br>(`CreateContact`) | `create a sfmc contact` | - `contact`: A map of field names to field values |
+| **Delete a SFMC contact**<br>(`DeleteContact`) | `delete the sfmc contact with key (?<contactKey>.+)` | - `contactKey`: Contact's unique key |
+| **Discover fields on a SFMC contact**<br>(`DiscoverContact`) | `discover fields on the sfmc contact with key (?<contactKey>.+)` | - `contactKey`: Contact's unique key |
+| **Update a SFMC contact**<br>(`UpdateContact`) | `update a sfmc contact with key (?<contactKey>.+)` | - `contactKey`: Contact's unique key <br><br>- `contact`: A map of field names to field values |
+| **Activate a Salesforce Marketing Cloud journey**<br>(`ActivateJourney`) | `activate the salesforce marketing cloud journey with id (?<id>[a-zA-Z0-9_-]+)` | - `id`: ID or Key of the journey to activate |
+| **Add a contact to a Salesforce Marketing Cloud journey**<br>(`AddContactToJourney`) | `add the contact with key (?<contactKey>[a-zA-Z0-9_@.-]+) to salesforce marketing cloud journey (?<journeyKey>[a-zA-Z0-9_-]+)` | - `contactKey`: Contact Key (or Email if using Email as Subscriber Key) <br><br>- `journeyKey`: Event Definition Key of the journey entry source <br><br>- `data`: Additional data to include with the contact for journey entry |
+| **Check a Salesforce Marketing Cloud journey status**<br>(`CheckJourneyStatus`) | `the salesforce marketing cloud journey with id (?<journeyId>[a-zA-Z0-9_-]+) should have status (?<expectedStatus>.+)` | - `journeyId`: ID or Key of the journey to check <br><br>- `expectedStatus`: Expected status of the journey |
+| **Create a Salesforce Marketing Cloud journey**<br>(`CreateJourney`) | `create a salesforce marketing cloud journey` | - `name`: Name of the journey <br><br>- `description`: Description of the journey <br><br>- `key`: Unique key for the journey <br><br>- `journey`: JSON object representing the journey definition |
+| **Delete a Salesforce Marketing Cloud journey**<br>(`DeleteJourney`) | `delete the salesforce marketing cloud journey with id (?<id>[a-zA-Z0-9_-]+)` | - `id`: ID of the journey to delete |
+| **Discover a Salesforce Marketing Cloud journey**<br>(`DiscoverJourney`) | `discover a salesforce marketing cloud journey with id (?<idOrKey>[a-zA-Z0-9_-]+)` | - `idOrKey`: ID or Key of the journey to discover <br><br>- `extras`: Extra information to include (activities, outcome, stats, all) |
+| **Update a Salesforce Marketing Cloud journey**<br>(`UpdateJourney`) | `update the salesforce marketing cloud journey with id (?<id>[a-zA-Z0-9_-]+)` | - `id`: ID of the journey to update <br><br>- `name`: New name of the journey <br><br>- `description`: New description of the journey <br><br>- `journey`: JSON object representing the journey update definition |
+| **Add a contact to a SFMC list**<br>(`AddContactToList`) | `add the salesforce marketing cloud contact with key (?<contactKey>.+) to list with id (?<listId>.+)` | - `contactKey`: The contact key to add to the list <br><br>- `listId`: The ID of the list to add the contact to |
+| **Create a SFMC list**<br>(`CreateList`) | `create a salesforce marketing cloud list` | - `list`: A map of field names to field values |
+| **Delete a SFMC list**<br>(`DeleteList`) | `delete the salesforce marketing cloud list with id (?<listId>.+)` | - `listId`: The ID of the list to delete |
+| **Discover Salesforce Marketing Cloud list members**<br>(`DiscoverListMembers`) | `discover members of salesforce marketing cloud list with id (?<listId>.+)` | - `listId`: The ID of the list to get members from <br><br>- `page`: Page number for paginated results (optional) <br><br>- `pageSize`: Number of members per page (optional, default 50) <br><br>- `filters`: Additional filters to apply to the member search (optional) |
+| **Discover Salesforce Marketing Cloud lists**<br>(`DiscoverLists`) | `discover salesforce marketing cloud lists` | - `filters`: Filters to apply to the list retrieval (optional) |
+| **Remove a contact from a SFMC list**<br>(`RemoveContactFromList`) | `remove the salesforce marketing cloud contact with key (?<contactKey>.+) from list with id (?<listId>.+)` | - `contactKey`: The contact key to remove from the list <br><br>- `listId`: The ID of the list to remove the contact from |
+| **Update a SFMC list**<br>(`UpdateList`) | `update the salesforce marketing cloud list with id (?<listId>.+)` | - `listId`: The ID of the list to update <br><br>- `list`: A map of field names to field values |
 <!-- stepDetailsEnd -->
 
 ## Development and Contributing
