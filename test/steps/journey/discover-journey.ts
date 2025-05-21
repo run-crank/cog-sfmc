@@ -85,7 +85,7 @@ describe('DiscoverJourney', () => {
     expect(records.length).to.equal(2);
     
     // Verify the first record (journey)
-    expect(records[0].getId()).to.equal('journey');
+    expect(records[0].getId()).to.equal('exposeOnPass:journey');
     
     // Safe access the record data
     const keyValue1 = records[0].getKeyValue();

@@ -86,7 +86,7 @@ export class DiscoverLists extends BaseStep implements StepInterface {
       };
     });
 
-    return this.table('lists', 'Discovered Lists', headers, rows);
+    return this.table('exposeOnPass:lists', 'Discovered Lists', headers, rows);
   }
 }
 

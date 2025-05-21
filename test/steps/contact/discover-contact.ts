@@ -87,7 +87,7 @@ describe('DiscoverContact', () => {
     expect(records.length).to.equal(2);
     
     // Verify the first record (contact)
-    expect(records[0].getId()).to.equal('contact');
+    expect(records[0].getId()).to.equal('exposeOnPass:contact');
     
     // Safe access the record data
     const keyValue1 = records[0].getKeyValue();

@@ -77,7 +77,7 @@ export class DiscoverJourney extends BaseStep implements StepInterface {
   }
 
   createRecord(journey: Record<string, any>) {
-    return this.keyValue('journey', 'Discovered Journey', journey);
+    return this.keyValue('exposeOnPass:journey', 'Discovered Journey', journey);
   }
 
   createOrderedRecord(journey: Record<string, any>, stepOrder = 1) {
