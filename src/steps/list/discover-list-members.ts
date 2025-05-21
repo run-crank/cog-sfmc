@@ -110,7 +110,7 @@ export class DiscoverListMembers extends BaseStep implements StepInterface {
       };
     });
 
-    return this.table('listMembers', `Members of List "${list.name}"`, headers, rows);
+    return this.table('exposeOnPass:listMembers', `Members of List "${list.name}"`, headers, rows);
   }
 }
 

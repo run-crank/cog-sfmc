@@ -80,7 +80,7 @@ export class DiscoverContact extends BaseStep implements StepInterface {
       }
     });
 
-    return this.keyValue('contact', 'Discovered Contact', obj);
+    return this.keyValue('exposeOnPass:contact', 'Discovered Contact', obj);
   }
 
   public createOrderedRecord(contact, stepOrder = 1): StepRecord {
